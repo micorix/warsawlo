@@ -2,7 +2,7 @@
   "name": "warsawlo",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://micorix.github.io/warsawlo",
+  "homepage": "https://warsawlo.pl",
   "dependencies": {
     "@babel/core": "7.1.0",
     "@fortawesome/fontawesome-svg-core": "^1.2.7",
