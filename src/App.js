@@ -2,6 +2,7 @@ import React, { Component, Fragment} from 'react';
 import styled, {createGlobalStyle} from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFacebook, faFacebookMessenger } from '@fortawesome/free-brands-svg-icons'
+import { faAt } from '@fortawesome/free-solid-svg-icons'
 import Logo from './Logo'
 const GlobalStyle = createGlobalStyle`
   @import "https://cdn.jsdelivr.net/gh/theleagueof/ostrich-sans/webfonts/ostrich-sans.css";
@@ -26,6 +27,23 @@ const Social = styled.div`
         fill: #59008A;
       }
     }
+  }
+  a{
+    display:flex;
+    align-items:center;
+    &:last-child{
+      display:inline-flex;
+    }
+  }
+  [data-icon="at"] + span{
+    opacity: 0;
+    transition: .2s all;
+    background:white;
+    padding:10px;
+    margin-left:-10px;
+  }
+  [data-icon="at"]:hover + span, [data-icon="at"] + span:hover{
+    opacity: 1;
   }
 `
 const Wrapper = styled.div`
@@ -79,6 +97,7 @@ class App extends Component {
             return (<Social>
               <a href="https://fb.com/warsawlo" target="_blank" rel="noopener noreferrer"><FontAwesomeIcon icon={faFacebook} size="3x" color="#4c5363"/></a>
               <a href="https://m.me/warsawlo" target="_blank" rel="noopener noreferrer"><FontAwesomeIcon icon={faFacebookMessenger} size="3x" color="#4c5363"/></a>
+              <a href="https://m.me/warsawlo" target="_blank" rel="noopener noreferrer"><FontAwesomeIcon icon={faAt} size="3x" color="#4c5363"/><span>info@warsawlo.pl</span></a>
             </Social>)
           }
           return null
