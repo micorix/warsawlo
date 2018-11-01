@@ -4,6 +4,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFacebook, faFacebookMessenger } from '@fortawesome/free-brands-svg-icons'
 import { faAt } from '@fortawesome/free-solid-svg-icons'
 import Logo from './Logo'
+
+const isTouchDevice = "ontouchstart" in document.documentElement
 const GlobalStyle = createGlobalStyle`
   @import "https://cdn.jsdelivr.net/gh/theleagueof/ostrich-sans/webfonts/ostrich-sans.css";
   @import url('https://fonts.googleapis.com/css?family=Playfair+Display:400&subset=latin-ext');
@@ -29,6 +31,8 @@ const Social = styled.div`
     }
   }
   a{
+    all:unset;
+    cursor:pointer;
     display:flex;
     align-items:center;
     &:last-child{
@@ -41,6 +45,10 @@ const Social = styled.div`
     background:white;
     padding:10px;
     margin-left:-10px;
+    color:#59008A;
+    font-family: 'Playfair Display';
+    font-weight:bold;
+    font-size:1.1em;
   }
   [data-icon="at"]:hover + span, [data-icon="at"] + span:hover{
     opacity: 1;
@@ -97,7 +105,7 @@ class App extends Component {
             return (<Social>
               <a href="https://fb.com/warsawlo" target="_blank" rel="noopener noreferrer"><FontAwesomeIcon icon={faFacebook} size="3x" color="#4c5363"/></a>
               <a href="https://m.me/warsawlo" target="_blank" rel="noopener noreferrer"><FontAwesomeIcon icon={faFacebookMessenger} size="3x" color="#4c5363"/></a>
-              <a href="https://m.me/warsawlo" target="_blank" rel="noopener noreferrer"><FontAwesomeIcon icon={faAt} size="3x" color="#4c5363"/><span>info@warsawlo.pl</span></a>
+              <a href={isTouchDevice ? "#" : "mailto:info@warsawlo.pl"}><FontAwesomeIcon icon={faAt} size="3x" color="#4c5363"/><span>info@warsawlo.pl</span></a>
             </Social>)
           }
           return null
