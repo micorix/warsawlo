@@ -50,7 +50,7 @@ const Social = styled.div`
     font-weight:bold;
     font-size:1.1em;
   }
-  [data-icon="at"]:hover + span, [data-icon="at"] + span:hover{
+  [data-icon="at"]:hover + span{
     opacity: 1;
   }
 `
