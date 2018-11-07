@@ -8,7 +8,7 @@ const getSchools = require('./schools')
 const format = require('./format')
 const getDetailedLocation = require('./localization')
 const extractThresholds = require('./thresholds')
-
+const JSONStream = require('JSONStream')
 prompt().then(answers => {
   if(answers.overwrite === false)
     process.exit()
@@ -25,7 +25,7 @@ prompt().then(answers => {
               .pipe(format())
               .pipe(extractThresholds(table))
               .pipe(getDetailedLocation())
-              .pipe(es.stringify())
+              .pipe(JSONStream.stringify())
               .pipe(fs.createWriteStream(`src/data/${answers.filename}`))
   })
 })

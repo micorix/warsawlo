@@ -1,9 +1,9 @@
 export default (state = {}, action) => {
   switch (action.type){
-    case 'UPDATE_NAV_HEIGHT':
+    case 'SELECT_SCHOOL':
         return {
           ...state,
-          navHeight: action.navHeight
+          school: action.school
         }
     default:
           return state;

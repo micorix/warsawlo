@@ -7,7 +7,7 @@ const hmAPI = new HereMapsAPI({
   app_code: process.env.HERE_APP_CODE
 })
 const getDetailedLocation = () => es.map((school, callback) => {
-
+console.log(school.name.full);
   hmAPI.geocode({
     searchtext: `${school.location.street} ${school.location.houseNumber}, Warszawa, Polska`
   }, (err, result) => {
@@ -17,11 +17,13 @@ const getDetailedLocation = () => es.map((school, callback) => {
     let position = result.Response.View[0].Result[0].Location.DisplayPosition
     let address = result.Response.View[0].Result[0].Location.Address
 
-    school.location = {
-      position,
-      address
-    }
-    callback(null, school)
+    callback(null, {
+      ...school,
+      location: {
+        position,
+        address
+      }
+    })
 })
 })
 module.exports = getDetailedLocation

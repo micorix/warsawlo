@@ -13,7 +13,7 @@ const getSchools = (schoolType) => new Promise(resolve => {
       let numberOfRequests = Math.ceil(total / 100)
       let streamsArray = []
       let missingData = []
-      for(let i=0; i < 1; i++){
+      for(let i=0; i < numberOfRequests; i++){
         streamsArray.push(
           hyperquest(`${url}&offset=${i*100}`)
           .pipe(JSONStream.parse('result.records.*'))
