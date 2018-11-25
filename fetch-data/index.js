@@ -24,7 +24,7 @@ if(process.argv[2] && process.argv[2] == 'auto'){
               .pipe(extractThresholds(table))
               .pipe(getDetailedLocation())
               .pipe(es.mapSync(school => {
-                counter++;
+  
                 console.log(`Done: ${school.name.full}`)
                 return school
               }))
