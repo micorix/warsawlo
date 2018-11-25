@@ -11,7 +11,16 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWljb3JpeHBhYm1lZCIsImEiOiJjamxrcGN2MW0wbXlxM
 injectGlobal`
 @import url('https://api.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css');
 `
+const mapDefaults = {
+  center: [21.009241599999996, 52.2320503],
+  zoom: 12,
+  pitch: 0
+}
 class Map extends React.Component {
+  state = {
+    schoolMarkers: null,
+    cameraRotation: null
+  }
   constructor(props){
     super(props)
     this.mapContainer = React.createRef()
@@ -20,37 +29,24 @@ class Map extends React.Component {
     this.map = new mapboxgl.Map({
       container: this.mapContainer.current,
       style: 'mapbox://styles/mapbox/streets-v9',
-      center: [21.009241599999996, 52.2320503],
-      zoom: 12
+      ...mapDefaults
     })
+    window.mapEl = this.map
+    console.log(this.map.getMaxBounds());
     this.map.addControl(new mapboxgl.NavigationControl());
-    addSchoolMarkers({
+    let schoolMarkers = addSchoolMarkers({
       map: this.map,
       selectSchool: this.props.selectSchool
     })
-  }
-  componentDidUpdate = (prevProps) => {
-    if(prevProps.select.school != this.props.select.school){
-      let position = this.props.select.school.location.position
-      this.map.easeTo({
-        zoom: 15,
-        center: [position.Longitude, position.Latitude]
-      });
-      setTimeout(() => {
-        var layers = this.map.getStyle().layers;
-
-    var labelLayerId;
-    for (var i = 0; i < layers.length; i++) {
-        if (layers[i].type === 'symbol' && layers[i].layout['text-field']) {
-            labelLayerId = layers[i].id;
-            break;
-        }
-    }
-    this.map.easeTo({
-      center: [position.Longitude, position.Latitude],
-      zoom: 17,
-      pitch: 60
+    this.schoolMarkers = schoolMarkers
+    this.map.on('load', () => {
+      this.addLayerToMap()
     })
+
+  }
+  addLayerToMap = () => {
+    let layers = this.map.getStyle().layers
+    let labelLayerId = layers.filter(layer => layer.type === 'symbol' && layer.layout['text-field']).pop().id
     this.map.addLayer({
         'id': '3d-buildings',
         'source': 'composite',
@@ -76,14 +72,66 @@ class Map extends React.Component {
             'fill-extrusion-opacity': .6
         }
     }, labelLayerId)
-      }, 5000)
+  }
+  rotateCamera = (timestamp) => {
+    // clamp the rotation between 0 -360 degrees
+    // Divide timestamp by 100 to slow rotation to ~10 degrees / sec
+    this.map.rotateTo((timestamp / 100) % 360, {duration: 0})
+    this.frameId = window.requestAnimationFrame(this.rotateCamera)
+  }
+  componentDidUpdate = (prevProps) => {
+    let schoolChanged = prevProps.select.school !== this.props.select.school
+
+    if(schoolChanged){
+      window.dispatchEvent(new Event('resize')) // resize map
+      clearInterval(this.animationTimeout)
+      cancelAnimationFrame(this.frameId)
+    }
+
+    // selection has been cleared
+    if(this.props.select.school === null && prevProps.select.school !== null){
+      this.map.easeTo(mapDefaults)
+      this.schoolMarkers.forEach(marker => marker.getElement().classList.remove('active'))
+    }
+
+    // school selection changed
+    if(this.props.select.school !== null && schoolChanged){
+      let bounds = this.map.getBounds()
+      // let padding = Math.abs(bounds._ne.lng - bounds._sw.lng)/6
+        let padding = 0
+      let position = [
+        this.props.select.school.location.position.Longitude-padding,
+        this.props.select.school.location.position.Latitude
+      ]
+      this.map.stop()
+      this.map.easeTo({
+        center: position,
+        duration: 800,
+        offset:[window.innerWidth/2,0],
+        zoom: 14,
+        around: [
+          this.props.select.school.location.position.Longitude,
+          this.props.select.school.location.position.Latitude
+        ]
+      })
+      this.animationTimeout = setTimeout(() => {
+        this.map.easeTo({
+          zoom: 17,
+          pitch:60,
+          center: position,
+          duration: 800,
+        })
+        setTimeout(() => this.rotateCamera(0), 800)
+      }, 10000)
+    this.map.setLayoutProperty('3d-buildings', 'visibility', 'visible')
+
     }
   }
 
   render() {
     let navHeight = this.props.style.navHeight ? this.props.style.navHeight : 0;
     return (<div ref={this.mapContainer} className={css`
-    width:${this.props.sidebar ? '70%' : '100%'};
+    width:${'100%'};
     float:right;
     height:calc(100vh - ${navHeight}px);
     div[class^='mapboxgl-ctrl-'], .mapboxgl-marker{

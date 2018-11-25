@@ -9,6 +9,7 @@ const format = require('./format')
 const getDetailedLocation = require('./localization')
 const extractThresholds = require('./thresholds')
 const JSONStream = require('JSONStream')
+let counter = 0;
 prompt().then(answers => {
   if(answers.overwrite === false)
     process.exit()
@@ -21,11 +22,18 @@ prompt().then(answers => {
   .then(values => {
     let table = values[0]
     let { stream } = values[1]
+      stream.on('end', () => console.log(`Processed ${counter} schools`))
         stream
               .pipe(format())
               .pipe(extractThresholds(table))
               .pipe(getDetailedLocation())
+              .pipe(es.mapSync(school => {
+                counter++;
+                console.log(`Done: ${school.name.full}`)
+                return school
+              }))
               .pipe(JSONStream.stringify())
               .pipe(fs.createWriteStream(`src/data/${answers.filename}`))
+
   })
 })

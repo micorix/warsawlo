@@ -21,7 +21,25 @@ const extractThresholds = rows => es.map((school, callback) => {
   const data = formatRows(rows)
   const matching = data.filter(dataSchool => dataSchool.name.toUpperCase() == school.name.full)
   if(matching.length > 0){
-    school.profiles = matching[0].profiles
+    let availableSubjects = new Set()
+    let pointsRange = [200,0]
+    school.profiles = {}
+    school.profiles.detailed = matching[0].profiles.map(profile => {
+      let subjects = profile[0].split('] ')[1]
+      subjects = subjects.slice(0, subjects.indexOf('(')).trim().split('-')
+      subjects.forEach(subject => availableSubjects.add(subject))
+      let threshold = parseFloat(profile[1].replace(',', '.'))
+      if(threshold > pointsRange[1]){
+        pointsRange[1] = threshold
+      }else if(threshold < pointsRange[0]){
+        pointsRange[0] = threshold
+      }
+      return [subjects, threshold]
+    })
+    school.profiles.overview = {
+      availableSubjects:  Array.from(availableSubjects),
+      pointsRange
+    }
   }
   callback(null, school)
 })

@@ -3,8 +3,8 @@ import { injectGlobal } from 'emotion'
 WebFont.load({
   google: {
     families: [
-      'Work Sans:400:latin-ext',
-      'Playfair Display:400:latin-ext'
+      'Work Sans:400:latin,latin-ext',
+      'Playfair Display:400'
     ]
   },
   custom: {
@@ -15,10 +15,14 @@ injectGlobal`
 *{
   font-family: Work Sans;
 }
+body{
+  overflow-x: hidden;
+}
 `
 const theme = {
   colors: {
-    primary: 'rgb(89, 0, 138)'
+    primary: 'rgb(89, 0, 138)',
+    light: 'rgb(242,242,242)'
   },
   fonts: {
     primary: 'Work Sans',

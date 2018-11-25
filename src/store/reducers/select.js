@@ -1,4 +1,4 @@
-export default (state = {}, action) => {
+export default (state = {school: null}, action) => {
   switch (action.type){
     case 'SELECT_SCHOOL':
         return {
