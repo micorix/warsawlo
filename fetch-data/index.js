@@ -18,13 +18,13 @@ if(process.argv[2] && process.argv[2] == 'auto'){
   .then(values => {
     let table = values[0]
     let { stream } = values[1]
-      stream.on('end', () => console.log(`Processed ${counter} schools`))
+  
         stream
               .pipe(format())
               .pipe(extractThresholds(table))
               .pipe(getDetailedLocation())
               .pipe(es.mapSync(school => {
-  
+
                 console.log(`Done: ${school.name.full}`)
                 return school
               }))
