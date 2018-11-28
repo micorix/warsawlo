@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-  Collapse,
-  Navbar,
-  NavbarToggler,
-  NavbarBrand,
-  Nav,
-  NavItem,
-  NavLink,
-  } from 'reactstrap'
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFacebook, faFacebookMessenger } from '@fortawesome/free-brands-svg-icons'
 import { faAt } from '@fortawesome/free-solid-svg-icons'
@@ -17,21 +9,39 @@ import {connect} from 'react-redux'
 import * as styleActions from '../store/actions/style'
 import Logo from './Logo'
 import {withRouter, Link} from 'react-router-dom'
-const Brand = styled(NavbarBrand)`
+const Brand = styled(Link)`
+all:unset;
+cursor:pointer;
+margin-right:20px;
 font-size: 2em;
 color:black !important;
-font-family: ${props => props.theme.fonts.tertiary};
-  span{
+display:flex;
+align-items:center;
+span:not(.highlight){
+  font-family: ${props => props.theme.fonts.tertiary};
+}
+  span.highlight{
     color: ${props => props.theme.colors.primary};
     font-family: ${props => props.theme.fonts.secondary}
   }
   svg{
     height:2.5em;
-    transform:translateY(-0.125em);
+
       path{
         fill: ${props => props.theme.colors.primary};
       }
   }
+`
+const Navbar = styled('nav')`
+position:fixed;
+top:0;
+left:0;
+width:calc(100vw - 20px * 2);
+display:flex;
+align-items:center;
+padding:0 20px 0 20px;
+background:white;
+z-index:10;
 `
 const SearchInput = styled('input')`
   all:unset;
@@ -48,6 +58,25 @@ const SearchInput = styled('input')`
   &:focus{
     border: 3px solid rgb(210,210,210);
   }
+`
+const LinksContainer = styled('div')`
+display:flex;
+align-items:center;
+justify-content:space-between;
+width:calc(100% - 20px);
+`
+const Action = styled('a')`
+margin:20px;
+`
+const NavLink = styled(Link)`
+all:unset;
+cursor:pointer;
+margin:20px;
+color: rgb(100, 100,100);
+transition: .2s all;
+&:hover{
+  color:black;
+}
 `
  class AppNavbar extends React.Component {
   constructor(props) {
@@ -81,46 +110,50 @@ const SearchInput = styled('input')`
   render() {
     return (
       <div ref={this.navbarEl}>
-        <Navbar color="light" light expand="md" fixed="top">
-          <Link to="/">
-          <Brand>
+        <Navbar className="navbar">
+
+          <Brand to="/">
           <Logo />
-          Warsaw<span>LO</span>
-          </Brand></Link>
-          <NavbarToggler onClick={this.toggle} />
-          <Collapse isOpen={this.state.isOpen} navbar>
-          <Nav className="mr-auto" navbar>
-            <NavItem>
-              <Link to="/about" className="nav-link">O projekcie</Link>
-            </NavItem>
-            <NavItem>
-              <Link to="/map" className="nav-link">Mapa</Link>
-            </NavItem>
-          </Nav>
-            <Nav className="ml-auto" navbar>
+          <span>Warsaw<span className="highlight">LO</span></span>
+        </Brand>
+
+
+        <LinksContainer>
+          <div className="mr-auto" navbar>
+
+              <NavLink to="/about" className="nav-link">O projekcie</NavLink>
+
+              <NavLink to="/map" className="nav-link">Mapa</NavLink>
+
+          </div>
+            <div className="ml-auto" navbar>
               {(() => {
                 console.log(this.props)
                 if(this.props.location.pathname !== '/' && this.props.location.pathname !== '/search')
                   return  <SearchInput placeholder="Szukaj szkoły" onChange={this.handleSearch}/>
                 return null
               })()}
+<Action href="http://fb.com/warsawlo" target="_blank" rel="noopener noreferrer"><FontAwesomeIcon icon={faFacebook} size="2x"/></Action>
+  <Action href="/about" target="_blank" rel="noopener noreferrer"><FontAwesomeIcon icon={faFacebookMessenger} size="2x"/></Action>
+    <Action href="mailto:info@warsawlo.pl" target="_blank" rel="noopener noreferrer"><FontAwesomeIcon icon={faAt} size="2x"/></Action>
 
-              <NavItem>
-                <NavLink href="http://fb.com/warsawlo" target="_blank" rel="noopener noreferrer"><FontAwesomeIcon icon={faFacebook} size="2x"/></NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink href="/about" target="_blank" rel="noopener noreferrer"><FontAwesomeIcon icon={faFacebookMessenger} size="2x"/></NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink href="mailto:info@warsawlo.pl" target="_blank" rel="noopener noreferrer"><FontAwesomeIcon icon={faAt} size="2x"/></NavLink>
-              </NavItem>
-            </Nav>
-          </Collapse>
+            </div>
+            </LinksContainer>
+
         </Navbar>
       </div>
     );
   }
 }
+// <NavItem>
+//
+// </NavItem>
+// <NavItem>
+//   <NavLink href="/about" target="_blank" rel="noopener noreferrer"><FontAwesomeIcon icon={faFacebookMessenger} size="2x"/></NavLink>
+// </NavItem>
+// <NavItem>
+//   <NavLink href="mailto:info@warsawlo.pl" target="_blank" rel="noopener noreferrer"><FontAwesomeIcon icon={faAt} size="2x"/></NavLink>
+// </NavItem>
 
 const mapDispatchToProps = (dispatch) => ({
     updateNavHeight: navHeight => dispatch(styleActions.updateNavHeight(navHeight))

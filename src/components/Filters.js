@@ -3,8 +3,14 @@ import styled from 'react-emotion'
 import {css} from 'emotion'
 import { Range, createSliderWithTooltip} from 'rc-slider'
 import 'rc-slider/assets/index.css'
-import subjects from '../data/subjects.json'
+import Subjects from '../data/subjects.json'
 import Tag from './Tag'
+import LocationModal from './modals/Location'
+import Input from './Input'
+
+// import {css} from 'emotion'
+// import {openModal} from '../store/actions/consent'
+import Button from './Button'
 const Wrapper = styled('div')`
   height:100%;
   width:25vw;
@@ -14,7 +20,8 @@ const Wrapper = styled('div')`
 
   .box{
     margin-top:10vh;
-    width:80%;
+    width:calc(80% - 20px);
+    padding:10px;
     height:70vh;
     background:white;
     // box-shadow: 0 37.125px 70px -12.125px rgba(0,0,0,0.3);
@@ -36,55 +43,101 @@ const PointsRange = styled(createSliderWithTooltip(Range))`
     background: ${props => props.theme.colors.primary};
   }
 `
-const initialState = {
-  subjects: [],
-  init:true
-}
- export default class Filters extends Component{
+const LocationWrapper = styled('div')`
+  position:relative;
+  user-select: ${props => props.enabled ? 'auto' : 'none'};
+  &::before{
+    content: ${props => !props.enabled ? "''" : 'none'};
+    width:100%;
+    position:absolute;
+    height:100%;
+    top:0;
+    left:0;
+    background: rgba(255,255,255,0.7);
+    z-index:2;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+`
+class Filters extends Component{
  constructor(props){
  super(props)
- this.state = initialState
+ this.state = {
+   subjects: [],
+   init:true,
+   pointsRange: [],
+   isModalOpen: false,
+   position: null
  }
- static getDerivedStateFromProps(props, state) {
-    if (state.init && props.data && props.data.subjects && props.data.subjects.length > 0 || props.data.query) {
-      return {
-        ...props.data,
-        init: false
-      }
-    }
-    return null
-  }
+ }
  handleSubjectsChange = (subject) => {
-   console.log(subject, this.state.subjects.includes(subject));
-     this.setState(state => ({
-       subjects: this.state.subjects.includes(subject) ? state.subjects.filter(e => e != subject) : [...state.subjects, subject]
-     }), () => {
-       this.props.onChange({
-         subjects: this.state.subjects
-       })
+   let subjects = this.props.data.subjects ? this.props.data.subjects : []
+   this.props.onChange({
+     subjects: subjects.includes(subject) ? subjects.filter(e => e != subject) : [...subjects, subject]
+   })
+ }
+ handlePoints = (value) => {
+     this.props.onChange({
+       pointsRange: value
      })
  }
- render = () => {
- return (
-   <Wrapper>
-   <div className="box">
-   {
-     subjects.map(subject => {
-       return (
-         <Tag
-         key={subject}
-         active={this.state.subjects.includes(subject[0])}
-         color={subject[1]}
-         onClick={this.handleSubjectsChange.bind(this, subject[0])}
-         >{subject[0]}</Tag>
-
-       )
+ handleLocationModal = (position) => {
+   if(position){
+     this.setState({
+       position,
+       isModalOpen: false
      })
    }
-   <h6>Liczba punktów:</h6>
-   <PointsRange min={0} max={200} tipFormatter={value => `${value} pkt`}/>
+ }
+ handleDistance = (e) => {
+   console.log(parseInt(e.target.value)*1000);
+   this.props.onChange({
+     distance: {
+       startPosition: this.state.position.coords,
+       maxDistance: parseInt(e.target.value)*1000
+     }
+   })
+ }
+ render = () => {
+   console.log(this.state.pointsRange, this.props);
+ return (<>
+   <Wrapper>
+   <div className="box">
+     <h3>Rozszerzam:</h3>
+   {
+       Subjects.map(subject => {
+         let isActive = this.props.data.subjects ? this.props.data.subjects.includes(subject[0]) : false
+         return (
+           <Tag
+
+           key={subject}
+           active={isActive}
+           color={subject[1]}
+           onClick={this.handleSubjectsChange.bind(this, subject[0])}
+           >{subject[0]}</Tag>
+
+         )
+       })
+
+   }
+   <h3>Liczba punktów:</h3>
+   <PointsRange min={0} max={200} onChange={this.handlePoints}/>
+    <h3>Lokalizacja</h3>
+    <LocationWrapper enabled={Boolean(this.state.position)}>
+    <p>Twoje współrzędne:<br /> {this.state.position && `${this.state.position.coords.latitude} ${this.state.position.coords.longitude}`}</p>
+    <div className="row">
+    <span> w promieniu</span> <Input type="number" className={css`width:2em;`} onChange={this.handleDistance} /> km
+    </div>
+    </LocationWrapper>
+    {!this.state.position && <Button onClick={() => this.setState({isModalOpen: true})}>Kliknij, aby odblokować usługi lokalizacji</Button>}
    </div>
    </Wrapper>
+   <LocationModal open={this.state.isModalOpen} onClose={this.handleLocationModal} />
+   </>
  )
  }
  }
+
+
+ export default Filters

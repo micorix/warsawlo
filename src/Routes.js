@@ -2,7 +2,7 @@ import React from 'react'
 import { Switch, Route } from 'react-router-dom'
 import Home from './pages/Home'
 import MapView from './pages/MapView'
-import Search from './pages/Search'
+import Search from './pages/Search/index'
 import School from './pages/School'
 const Routes = props => (
   <Switch>

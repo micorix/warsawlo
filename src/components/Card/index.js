@@ -1,6 +1,5 @@
 import React, {Component} from 'react'
-import { Card, CardImg, CardText, CardBody,
-  CardTitle, CardSubtitle, Button } from 'reactstrap';
+
 import styled from 'react-emotion'
 import {css} from 'emotion'
 import {connect} from 'react-redux'
@@ -8,14 +7,11 @@ import {selectSchool} from '../../store/actions/select'
 import {Link} from 'react-router-dom'
 import Subjects from '../../data/subjects.json'
 import Tag from '../Tag'
-const SmallTag = styled(Tag)`
-  font-size: 0.8em;
-  margin: 2px;
-`
+import Button from '../Button'
 const SitePreview = styled('div')`
   position:relative;
   width:${props => props.dimensions.width}px;
-  height:${props => props.dimensions.height * 0.4}px;
+  height:15rem;
   padding: 0;
   overflow: hidden;
   margin: 0 auto 0 auto;
@@ -47,10 +43,27 @@ const SitePreview = styled('div')`
     color:white;
   }
 `
-const cardStyle = css`
-  overflow:hidden;
-  height:100%;
-  width:100%;
+const CardElement = styled('div')`
+overflow:hidden;
+height:100%;
+width:100%;
+background:white;
+`
+const CardBody = styled('div')`
+width: calc(100% - 20px);
+padding: 10px;
+
+h1{
+  font-size: 1.2em;
+  margin:0;
+}
+h2{
+  font-size: .8em;
+  color:rgb(100,100,100);
+}
+a{
+  all:unset;
+}
 `
 const getWikiSummary = (name, signal) => new Promise(async (resolve) => {
   let searchRes, pageRes
@@ -127,13 +140,13 @@ class SchoolCard extends Component{
    this.controller = new AbortController()
    this.signal = this.controller.signal
 
-   getWikiSummary(this.props.school.name.full, this.signal).then(summary => {
-     this.setState({
-       summary
-     })
-   }).catch(err => {
-     console.log(err);
-   })
+   // getWikiSummary(this.props.school.name.full, this.signal).then(summary => {
+   //   this.setState({
+   //     summary
+   //   })
+   // }).catch(err => {
+   //   console.log(err);
+   // })
  }
  componentWillUnmount = () =>{
    this.controller.abort()
@@ -157,34 +170,47 @@ class SchoolCard extends Component{
  render = () => {
    return (
      <div ref={this.el}>
-       <Card onClick={this.selectSchool} className={cardStyle}>
+       <CardElement onClick={this.selectSchool}>
        <SitePreview dimensions={this.state.dimensions} website={!this.state.loadError & Boolean(this.props.school.contact.website)}>
        {
          (() => {
-           if(!this.state.loadError && this.props.school.contact.website)
-             return <iframe src={`http://${this.props.school.contact.website}`} ref={this.frame} onLoad={this.handleLoad}></iframe>
+           // if(!this.state.loadError && this.props.school.contact.website)
+           //   return <iframe sandbox src={`http://${this.props.school.contact.website}`} ref={this.frame} onLoad={this.handleLoad}></iframe>
 
            return null
          })()
        }
        </SitePreview>
          <CardBody>
-           <CardTitle>{this.props.school.name.full}</CardTitle>
-           <CardSubtitle>{this.props.school.location.address.District}</CardSubtitle>
+           <h1>{this.props.school.name.full}</h1>
+           <h2>{this.props.school.location.address.District}</h2>
            {(() => {
             if(this.props.school.profiles){
               return this.props.school.profiles.overview.availableSubjects.map(subject => {
-                let color = Subjects.filter(arr => arr[2] == subject)[0]
-                color = color ? color[1] : 'black'
-                return <SmallTag color={color}>{subject}</SmallTag>
+                let info = Subjects.filter(arr => arr[2] == subject)
+                console.log(this.props.filters.subjects, subject);
+                let color = 'black'
+                let isActive = false
+                if(info && info[0]){
+                  color = info[0][1]
+                  isActive = this.props.filters.subjects ? this.props.filters.subjects.includes(info[0][0]) : false
+                  }
+                return (<Tag
+                  small
+                  color={color}
+                  key={subject}
+                  active={isActive}
+                  >
+                  {subject}
+                </Tag>)
               })
             }
             return null
            })()}
-           <CardText>{this.state.summary.length > 100 ? this.state.summary.substr(0, 100).trim()+' ...' : this.state.summary}</CardText>
+           <p>{this.state.summary.length > 100 ? this.state.summary.substr(0, 100).trim()+' ...' : this.state.summary}</p>
            <Link to={`/school/${this.props.school.name.full.split(' ').join('+')}`}><Button>Więcej</Button></Link>
          </CardBody>
-       </Card>
+       </CardElement>
      </div>
    )
  }
