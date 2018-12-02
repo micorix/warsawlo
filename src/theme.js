@@ -17,12 +17,15 @@ injectGlobal`
 }
 body{
   overflow-x: hidden;
+  margin:0;
 }
 `
 const theme = {
   colors: {
     primary: 'rgb(89, 0, 138)',
-    light: 'rgb(242,242,242)'
+    light: 'rgb(242,242,242)',
+    secondLight: 'rgb(230,230,230)',
+    grey: 'rgb(210,210,210)',
   },
   fonts: {
     primary: 'Work Sans',

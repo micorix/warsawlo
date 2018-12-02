@@ -4,6 +4,7 @@ import styled from 'react-emotion'
 
 const Wrapper = styled('div')`
   width:100%;
+  background: ${props => props.theme.colors.light};
   min-height: calc(100vh - ${props => props.navHeight}px);
 `
 

@@ -124,7 +124,7 @@ transition: .2s all;
               <NavLink to="/about" className="nav-link">O projekcie</NavLink>
 
               <NavLink to="/map" className="nav-link">Mapa</NavLink>
-
+              <NavLink to="/calculator" className="nav-link">Kalkulator punktów</NavLink>
           </div>
             <div className="ml-auto" navbar>
               {(() => {

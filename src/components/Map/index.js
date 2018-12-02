@@ -85,7 +85,7 @@ class Map extends React.Component {
     if(schoolChanged){
       window.dispatchEvent(new Event('resize')) // resize map
       clearInterval(this.animationTimeout)
-      cancelAnimationFrame(this.frameId)
+      // cancelAnimationFrame(this.frameId)
     }
 
     // selection has been cleared
@@ -97,32 +97,32 @@ class Map extends React.Component {
     // school selection changed
     if(this.props.select.school !== null && schoolChanged){
       let bounds = this.map.getBounds()
-      // let padding = Math.abs(bounds._ne.lng - bounds._sw.lng)/6
-        let padding = 0
+      let padding = Math.abs(bounds._ne.lat - bounds._sw.lat)*6/10
+        // let padding = 0
       let position = [
-        this.props.select.school.location.position.Longitude-padding,
-        this.props.select.school.location.position.Latitude
+        this.props.select.school.location.position.Longitude,
+        this.props.select.school.location.position.Latitude,
       ]
       this.map.stop()
       this.map.easeTo({
         center: position,
         duration: 800,
-        offset:[window.innerWidth/2,0],
+        offset:[0,100],
         zoom: 14,
         around: [
           this.props.select.school.location.position.Longitude,
           this.props.select.school.location.position.Latitude
         ]
       })
-      this.animationTimeout = setTimeout(() => {
-        this.map.easeTo({
-          zoom: 17,
-          pitch:60,
-          center: position,
-          duration: 800,
-        })
-        setTimeout(() => this.rotateCamera(0), 800)
-      }, 10000)
+      // this.animationTimeout = setTimeout(() => {
+      //   this.map.easeTo({
+      //     zoom: 17,
+      //     pitch:60,
+      //     center: position,
+      //     duration: 800,
+      //   })
+      //   setTimeout(() => this.rotateCamera(0), 800)
+      // }, 10000)
     this.map.setLayoutProperty('3d-buildings', 'visibility', 'visible')
 
     }
