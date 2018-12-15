@@ -29,10 +29,12 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {css, keyframes} from 'emotion'
+const responsiveWidth = '1000px'
 const First = styled(SiteWrapper)`
   display:block;
   background: ${props => props.theme.colors.primary.replace('rgb', 'rgba').replace(')', ',0)')} ;
   position:relative;
+  overflow-x:hidden;
   &:last-child{
     margin-top:60vh;
     margin-left:-10vw;
@@ -65,6 +67,17 @@ const First = styled(SiteWrapper)`
     background-position: 90% bottom;
     background-repeat:no-repeat;
     transform: rotate(30deg) scale(1.2);
+
+  }
+  @media (max-width: ${responsiveWidth}){
+    &::before{
+    transform:none;
+    top:0;
+  }
+  &::after{
+    background-position: 90% bottom;
+    top:0;left:40%;
+    opacity:.4;
   }
 `
 const Header = styled('div')`
@@ -80,6 +93,10 @@ const Header = styled('div')`
     font-size:1.1em;
     letter-spacing:2px;
 
+  }
+  @media (max-width: ${responsiveWidth}){
+    width:100vw;
+    padding-top:2vh;
   }
 `
 const PageWrapper = styled(SiteWrapper)`
@@ -110,6 +127,10 @@ const HalfContainer = styled('div')`
   h1{
     font-size:3rem;
   }
+  @media (max-width: ${responsiveWidth}){
+    width:calc(100vw - 10%);
+    display:block;
+  }
 `
 const FullContainer = styled('div')`
 padding: 0 5vw 0 5vw;
@@ -117,9 +138,13 @@ width:90vw;
 background:${props => props.background ? props.theme.colors[props.background] : 'transparent'};
 color:${props => props.background ? 'white' : 'black'};
 ${props => props.shape &&
-  `clip-path: polygon(0 20%, 100% 0, 100% 80%, 0% 100%);
-   padding-top:5%;
-   padding-bottom:5%;`
+  `
+  @media (min-width: ${responsiveWidth}){
+    clip-path: polygon(0 20%, 100% 0, 100% 80%, 0% 100%);
+     padding-top:5%;
+     padding-bottom:5%;`
+  }
+
 }
 h1{
   font-size:3rem;
@@ -128,6 +153,9 @@ p{
   line-height:1.5em;
   font-size:1.1em;
   letter-spacing:2px;
+}
+@media (max-width: ${responsiveWidth}){
+  display:block;
 }
 `
 const Inline = styled('div')`
@@ -150,6 +178,9 @@ const InlineWrapper = styled('div')`
   grid-template-columns: 1fr 1fr;
   grid-column-gap:20px;
   grid-row-gap:3em;
+  @media (max-width: ${responsiveWidth}){
+    grid-template-columns: 1fr;
+  }
 `
 const Centered = styled('div')`
   display:flex;
@@ -183,6 +214,10 @@ const blink = keyframes`
 `
 const SourcesAnimation = styled('div')`
   width: 50%;
+  @media (max-width: ${responsiveWidth}){
+    width:100%;
+    padding-top:2vh;
+  }
   .sources{
     display:flex;
     justify-content:space-around;
@@ -226,11 +261,20 @@ const Box = styled('div')`
   h1{
     margin-top:0;
   }
+
+    @media (max-width: ${responsiveWidth}){
+      width:100%;
+      padding:0;
+    }
+
 `
 const BoxWrapper = styled('div')`
   width:50%;
   display:flex;
   justify-content:center;
+  @media (max-width: ${responsiveWidth}){
+    width:100%;
+  }
 `
 const StartButton = styled(Button)`
   font-size: 3em;
@@ -382,6 +426,9 @@ const StartButton = styled(Button)`
 
            <div className={css`
              width:50%;
+             @media (max-width: ${responsiveWidth}){
+               width:100%;
+             }
              `}>
              <h1>Nieaktualne dane?</h1>
              <Break color="secondary" />
@@ -399,8 +446,14 @@ const StartButton = styled(Button)`
        align-items:center;
        justify-content:center;
        `}>
+       <div className={css`
+         @media (max-width: ${responsiveWidth}){
+           display:none;
+         }
+         `}>
      <FontAwesomeIcon icon={faExclamation} size="10x"/>
      <FontAwesomeIcon icon={faQuestion} size="10x"/>
+     </div>
      </div>
 
      </FullContainer>
@@ -415,7 +468,11 @@ const StartButton = styled(Button)`
        align-items:center;
        justify-content:center;
        `}>
-     <FontAwesomeIcon icon={faUsers} size="10x"/>
+     <FontAwesomeIcon icon={faUsers} size="10x" className={css`
+       @media (max-width: ${responsiveWidth}){
+         display:none;
+       }
+       `}/>
      </div>
      <BoxWrapper>
        <Box>

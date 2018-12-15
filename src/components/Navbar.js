@@ -2,7 +2,8 @@ import React from 'react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFacebook, faFacebookMessenger } from '@fortawesome/free-brands-svg-icons'
-import { faAt } from '@fortawesome/free-solid-svg-icons'
+import { faAt, faCompass } from '@fortawesome/free-solid-svg-icons'
+// import { faCompass } from '@fortawesome/free-regular-svg-icons'
 import { css} from 'emotion'
 import styled from 'react-emotion'
 import {connect} from 'react-redux'
@@ -10,6 +11,9 @@ import * as styleActions from '../store/actions/style'
 import Logo from './Logo'
 import {withRouter, Link} from 'react-router-dom'
 import withBadge from '../utils/withBadge'
+
+const responsiveWidth = '1100px'
+
 const Brand = styled(Link)`
 all:unset;
 cursor:pointer;
@@ -34,6 +38,10 @@ span:not(.highlight){
   }
 `
 const Navbar = styled('nav')`
+@media (max-width: ${responsiveWidth}) {
+  display:block;
+}
+-webkit-transform: translateZ(0);
 position:fixed;
 top:0;
 left:0;
@@ -55,28 +63,48 @@ const SearchInput = styled('input')`
   border: 3px solid rgb(230,230,230);
   border-radius:3px;
   font-size: 1.2em;
-  width:50%;
+  width:40%;
   transition: .2s all;
   &:focus{
-    margin-right:0;
+    margin-left:-10%;
+    width:50%;
     border: 3px solid rgb(210,210,210);
+  }
+  @media (max-width: ${responsiveWidth}) {
+    display:none;
   }
 `
 const LinksContainer = styled('div')`
+@media (max-width: ${responsiveWidth}) {
+  display:block;
+  ${props => !props.opened && `
+    display:none;
+
+    `}
+}
+// transition: visibility 2s ease-in 0s, max-height 5s ease-in .2s;
+
 display:flex;
 align-items:center;
 justify-content:space-between;
 width:calc(100% - 20px);
-div{
+div:not(&:last-child){
   display:flex;
   align-items:center;
   flex-wrap: nowrap;
+  @media (max-width: ${responsiveWidth}) {
+    display:block;
+  }
 }
 `
+
 const Action = styled('a')`
 margin:20px;
 `
 const NavLink = withBadge(styled(Link)`
+@media (max-width: ${responsiveWidth}) {
+  display:block;
+}
 all:unset;
 cursor:pointer;
 margin:20px;
@@ -89,6 +117,38 @@ transition: .2s all;
   title: 'BETA',
   color: 'secondary'
 })
+const MenuSwitch = styled(FontAwesomeIcon)`
+path{
+  fill:transparent;
+  stroke: ${props => props.theme.colors.secondary};
+  stroke-width:20;
+}
+transition: .2s all;
+&:hover{
+  transform: rotate(30deg);
+}
+  @media (max-width: ${responsiveWidth}) {
+    display:block;
+  }
+  display:none;
+`
+const Top = styled('div')`
+@media (max-width: ${responsiveWidth}) {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  width:100%;
+}
+`
+const ActionsWrapper = styled('div')`
+@media (max-width: ${responsiveWidth}) {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  width:100%;
+}
+display:inline-block;
+`
  class AppNavbar extends React.Component {
   constructor(props) {
     super(props);
@@ -98,7 +158,11 @@ transition: .2s all;
     }
     this.navbarEl = React.createRef()
   }
-
+  componentDidUpdate = (prevProps, prevState) => {
+    if(prevState.isOpen !== this.state.isOpen){
+      window.dispatchEvent(new Event('resize'));
+    }
+  }
   componentDidMount = () => {
     this.props.updateNavHeight(this.navbarEl.current.querySelector('.navbar').offsetHeight)
     window.addEventListener('resize', e => this.props.updateNavHeight(this.navbarEl.current.querySelector('.navbar').offsetHeight))
@@ -125,14 +189,18 @@ transition: .2s all;
       <div ref={this.navbarEl}>
         <Navbar className="navbar">
 
-          <Brand to="/">
+<Top opened={this.state.isOpen}>
+          <Brand to="/"  onClick={this.toggle} >
           <Logo />
           <span>Warsaw<span className="highlight">LO</span></span>
+
+
         </Brand>
+          <MenuSwitch icon={faCompass} size="2x" onClick={this.toggle}/>
+  </Top>
 
-
-        <LinksContainer>
-          <div className="mr-auto">
+        <LinksContainer opened={this.state.isOpen} onClick={this.toggle}>
+          <div>
 
               <NavLink to="/start" className={this.isLinkActive('/start')}>Start</NavLink>
 
@@ -145,10 +213,11 @@ transition: .2s all;
                   return  <SearchInput placeholder="Szukaj szkoły" onChange={this.handleSearch}/>
                 return null
               })()}
+              <ActionsWrapper>
 <Action href="http://fb.com/warsawlo" target="_blank" rel="noopener noreferrer"><FontAwesomeIcon icon={faFacebook} size="2x"/></Action>
   <Action href="/about" target="_blank" rel="noopener noreferrer"><FontAwesomeIcon icon={faFacebookMessenger} size="2x"/></Action>
     <Action href="mailto:info@warsawlo.pl" target="_blank" rel="noopener noreferrer"><FontAwesomeIcon icon={faAt} size="2x"/></Action>
-
+</ActionsWrapper>
             </div>
             </LinksContainer>
 
