@@ -5,8 +5,11 @@ import MapView from './pages/MapView'
 import Search from './pages/Search/index'
 import Calculator from './pages/Calculator'
 import About from './pages/About'
+import Manage from './pages/manage'
 const Routes = props => (
   <Switch>
+  <Route path='/manage' component={Manage} />
+
   <Route path='/school/:schoolID' component={MapView} />
   <Route path='/map' component={MapView} />
   <Route path='/search' component={Search} />

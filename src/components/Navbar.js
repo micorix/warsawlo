@@ -9,6 +9,7 @@ import {connect} from 'react-redux'
 import * as styleActions from '../store/actions/style'
 import Logo from './Logo'
 import {withRouter, Link} from 'react-router-dom'
+import withBadge from '../utils/withBadge'
 const Brand = styled(Link)`
 all:unset;
 cursor:pointer;
@@ -42,6 +43,7 @@ align-items:center;
 padding:0 20px 0 20px;
 background:white;
 z-index:10;
+border-bottom: 2px solid ${props => props.theme.colors.light};
 `
 const SearchInput = styled('input')`
   all:unset;
@@ -56,6 +58,7 @@ const SearchInput = styled('input')`
   width:50%;
   transition: .2s all;
   &:focus{
+    margin-right:0;
     border: 3px solid rgb(210,210,210);
   }
 `
@@ -64,20 +67,28 @@ display:flex;
 align-items:center;
 justify-content:space-between;
 width:calc(100% - 20px);
+div{
+  display:flex;
+  align-items:center;
+  flex-wrap: nowrap;
+}
 `
 const Action = styled('a')`
 margin:20px;
 `
-const NavLink = styled(Link)`
+const NavLink = withBadge(styled(Link)`
 all:unset;
 cursor:pointer;
 margin:20px;
 color: rgb(100, 100,100);
 transition: .2s all;
-&:hover{
+&:hover, &.active{
   color:black;
 }
-`
+`,{
+  title: 'BETA',
+  color: 'secondary'
+})
  class AppNavbar extends React.Component {
   constructor(props) {
     super(props);
@@ -87,6 +98,7 @@ transition: .2s all;
     }
     this.navbarEl = React.createRef()
   }
+
   componentDidMount = () => {
     this.props.updateNavHeight(this.navbarEl.current.querySelector('.navbar').offsetHeight)
     window.addEventListener('resize', e => this.props.updateNavHeight(this.navbarEl.current.querySelector('.navbar').offsetHeight))
@@ -96,6 +108,7 @@ transition: .2s all;
       isOpen: !this.state.isOpen
     });
   }
+  isLinkActive = (pathname) => this.props.location.pathname == pathname ? 'active' : ''
   handleSearch = (e) => {
     this.props.history.replace({
       pathname: '/search',
@@ -119,17 +132,16 @@ transition: .2s all;
 
 
         <LinksContainer>
-          <div className="mr-auto" navbar>
+          <div className="mr-auto">
 
-              <NavLink to="/about" className="nav-link">O projekcie</NavLink>
+              <NavLink to="/start" className={this.isLinkActive('/start')}>Start</NavLink>
 
-              <NavLink to="/map" className="nav-link">Mapa</NavLink>
-              <NavLink to="/calculator" className="nav-link">Kalkulator punktów</NavLink>
+              <NavLink to="/map" className={this.isLinkActive('/map')}>Mapa</NavLink>
+              <NavLink to="/calculator" className={this.isLinkActive('/calculator')}>Kalkulator punktów</NavLink>
           </div>
-            <div className="ml-auto" navbar>
+            <div>
               {(() => {
-                console.log(this.props)
-                if(this.props.location.pathname !== '/' && this.props.location.pathname !== '/search')
+                if(this.props.location.pathname !== '/start' && this.props.location.pathname !== '/search')
                   return  <SearchInput placeholder="Szukaj szkoły" onChange={this.handleSearch}/>
                 return null
               })()}
@@ -161,4 +173,4 @@ const mapDispatchToProps = (dispatch) => ({
 )
 
 // Use connect to put them together
-export default connect(null, mapDispatchToProps)(withRouter(AppNavbar))
+export default withRouter(connect(null, mapDispatchToProps)(AppNavbar))

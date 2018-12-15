@@ -5,6 +5,10 @@ import Time from './time.jpg'
 import logo from '../logo.svg'
 import Logo from '../Logo'
 import Button from '../components/Button'
+import Break from '../components/Break'
+import {Link} from 'react-router-dom'
+import { animateScroll} from 'react-scroll'
+import withBadge from '../utils/withBadge'
 import {
   faMapMarkerAlt,
   faChartBar,
@@ -18,6 +22,10 @@ import {
   faMapMarkedAlt,
   faCog,
   faDesktop,
+  faExclamation,
+  faQuestion,
+  faUsers,
+  faStar
 } from '@fortawesome/free-solid-svg-icons'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {css, keyframes} from 'emotion'
@@ -79,10 +87,14 @@ background:transparent;
 `
 const LightButton = styled(Button)`
   color:${props => props.theme.colors.primary};
-  margin-top:20px;
+  margin:20px;
   border-color:white;
   font-size:1.5em;
 `
+const LightButtonWithBadge = withBadge(LightButton, {
+  title: 'BETA',
+  color: 'secondary'
+})
 const HalfContainer = styled('div')`
   padding:0 5% 5% 5%;
   width:90vw;
@@ -100,10 +112,15 @@ const HalfContainer = styled('div')`
   }
 `
 const FullContainer = styled('div')`
-margin: 0 5vw 0 5vw;
+padding: 0 5vw 0 5vw;
 width:90vw;
-background:transparent;
-color:black;
+background:${props => props.background ? props.theme.colors[props.background] : 'transparent'};
+color:${props => props.background ? 'white' : 'black'};
+${props => props.shape &&
+  `clip-path: polygon(0 20%, 100% 0, 100% 80%, 0% 100%);
+   padding-top:5%;
+   padding-bottom:5%;`
+}
 h1{
   font-size:3rem;
 }
@@ -111,7 +128,6 @@ p{
   line-height:1.5em;
   font-size:1.1em;
   letter-spacing:2px;
-
 }
 `
 const Inline = styled('div')`
@@ -124,21 +140,11 @@ h2{
   letter-spacing:2px;
   margin-left:2em;
 }
-&::after{
-  content: ${props => props.soon ? '"Coming soon"' : 'none'};
-  display:block;
-  border: 2px solid ${props => props.theme.colors.primary};
-  background: white;
-  padding: 5px;
-  color: black;
-  top:0;
-  right:0;
-  width: 25%;
-  position: absolute;
-  text-align:center;
-  transform: rotate(10deg);
-}
 `
+const InlineSoon = withBadge(Inline, {
+  title: 'Coming soon',
+  color: 'primary'
+})
 const InlineWrapper = styled('div')`
   display:grid;
   grid-template-columns: 1fr 1fr;
@@ -214,10 +220,9 @@ const SourcesAnimation = styled('div')`
 `
 const Box = styled('div')`
   width:80%;
-  border-top: 7px solid ${props => props.theme.colors.primary};
+
   padding:10px;
-  background:black;
-  color:white;
+
   h1{
     margin-top:0;
   }
@@ -227,9 +232,22 @@ const BoxWrapper = styled('div')`
   display:flex;
   justify-content:center;
 `
+const StartButton = styled(Button)`
+  font-size: 3em;
+  background: ${props => props.theme.colors.secondary};
+  color:white;
+  border-color: ${props => props.theme.colors.secondary};
+  &:hover{
+    background:transparent;
+    color:${props => props.theme.colors.secondary};
+  }
+`
  export default class About extends Component{
  constructor(props){
  super(props)
+ }
+ scrollToContent = () => {
+   animateScroll.scrollTo(window.innerHeight*0.8);
  }
  render = () => {
  return (
@@ -243,13 +261,17 @@ const BoxWrapper = styled('div')`
   Możesz odwiedzić każdy licealny zakątek internetu
   albo znaleźć swoją szkołę marzeń w trzy klinknięcia!
 </p>
-<LightButton>Zobacz, jak to działa</LightButton>
+<LightButton onClick={this.scrollToContent}>Czytaj dalej</LightButton>
+<Link to='/start' className={css`all:unset;margin: 20px 0 0 0;`}>
+<LightButtonWithBadge>Znajdź mi szkołę</LightButtonWithBadge>
+</Link>
 </Header>
 </First>
 
 
      <HalfContainer>
        <h1>To prostsze!</h1>
+       <Break color="secondary" />
        <p>Nadal nie mówimy, że najławiejsze. <br />To twój wybór, ale cieszymy się, że możemy Ci go ułatwić.</p>
        <h2 className={css`margin: 2em 0 2em 0;`}>Filtruj na podstawie kryteriów:</h2>
        <InlineWrapper>
@@ -261,14 +283,14 @@ const BoxWrapper = styled('div')`
            <h2>Podstawowe informacje</h2>
            </Centered>
          </Inline>
-       <Inline soon>
+       <InlineSoon>
          <Centered>
          <FontAwesomeIcon icon={faBus} size="3x" />
               </Centered>
          <Centered notHorizontal>
          <h2>Dojazd komunikacją</h2>
               </Centered>
-       </Inline>
+       </InlineSoon>
 
        <Inline>
          <Centered>
@@ -279,14 +301,14 @@ const BoxWrapper = styled('div')`
               </Centered>
        </Inline>
 
-       <Inline soon>
+       <InlineSoon>
          <Centered>
          <FontAwesomeIcon icon={faFileAlt} size="3x" />
               </Centered>
          <Centered notHorizontal>
          <h2>Zdawalność matur</h2>
               </Centered>
-       </Inline>
+       </InlineSoon>
        <Inline>
          <Centered>
          <FontAwesomeIcon icon={faChartBar} size="3x" />
@@ -295,20 +317,20 @@ const BoxWrapper = styled('div')`
          <h2>Progi punktowe</h2>
               </Centered>
        </Inline>
-       <Inline soon>
+       <InlineSoon>
          <Centered>
-         <FontAwesomeIcon icon={faAmbulance} size="3x" />
+         <FontAwesomeIcon icon={faStar} size="3x" />
               </Centered>
          <Centered notHorizontal>
-         <h2>Wypadki w szkołach</h2>
+         <h2>Oceny innych</h2>
               </Centered>
-       </Inline>
+       </InlineSoon>
 
 
        </InlineWrapper>
      </HalfContainer>
 
-     <FullContainer background="primary" className={css`
+     <FullContainer background="secondary" shape  className={css`
               display:flex;
               align-items:center;
               margin-top:7vh;
@@ -331,7 +353,9 @@ const BoxWrapper = styled('div')`
        </SourcesAnimation>
        <BoxWrapper>
          <Box>
+
            <h1>Jak to działa?</h1>
+           <Break color="primary" />
            <h2>Pobieramy dane z różnych źródeł, aby móc przedstawić Ci je w jak najlepszej postaci.</h2>
            <p>
              Korzystamy z danych Urzędu Miasta Warszawy, aby pobrać listę szkół oraz średnie liczby punktów,
@@ -341,19 +365,112 @@ const BoxWrapper = styled('div')`
              <br />
              A to wszystko zebrane tylko w jednym miejscu...
            </p>
+           <Link to="/dev" className={css`
+             color:white;
+             &:visited{
+               color:white;
+             }
+             `}>Dowiedz się o tym więcej na naszym blogu</Link>
          </Box>
        </BoxWrapper>
      </FullContainer>
-     <Line />
-     <FullContainer>
-       <h1>Zawsze aktualne</h1>
-       <h2>Pragniemy, abyś już nigdy nie musiał martwić się o prawidłowość danych.
-         </h2>
-         <p className={css`width:50%`}>Dzięki naszym edytorom, którzy sprawdzają nasz portal oraz wsparciu (mamy nadzieję)
-           Waszej społeczności będziemy budować coś przydatnego i fajnego
-         </p>
-     </FullContainer>
 
+     <FullContainer className={css`
+              display:flex;
+              align-items:center;
+           `}>
+
+           <div className={css`
+             width:50%;
+             `}>
+             <h1>Nieaktualne dane?</h1>
+             <Break color="secondary" />
+             <h2>Nobody's perfect...</h2>
+               <p className={css`width:100%`}>
+               Przetwarzając ogromne ilości informacji może wkraść się do danych jakiś błąd.
+               Jeżeli natkniesz się na niego, zgłoś go.
+               Nasi moderatorzy zajmą się tym tak szybko, jak tylko będę mogli.
+               </p>
+             </div>
+
+     <div className={css`
+       width:50%;
+       display:flex;
+       align-items:center;
+       justify-content:center;
+       `}>
+     <FontAwesomeIcon icon={faExclamation} size="10x"/>
+     <FontAwesomeIcon icon={faQuestion} size="10x"/>
+     </div>
+
+     </FullContainer>
+     <FullContainer className={css`
+              display:flex;
+              align-items:center;
+              margin-top:7vh;
+           `}>
+     <div className={css`
+       width:50%;
+       display:flex;
+       align-items:center;
+       justify-content:center;
+       `}>
+     <FontAwesomeIcon icon={faUsers} size="10x"/>
+     </div>
+     <BoxWrapper>
+       <Box>
+       <h1>Społeczność</h1>
+       <Break color="secondary" />
+       <h2>Ten portal tworzy każdy z nas</h2>
+         <p className={css`width:100%`}>
+        Idziesz dopiero do liceum i zrobiłeś ogromny research, czy może masz już rekrutacje za sobą i wiesz jak to działa?
+        Podziel się swoimi spostrzeżeniami tutaj.
+        Każdego ucznia ostatniej klasy gimnazjum czy podtawówki co roku czeka to samo.
+        Pomagajmy sobie nawzajem.  WarsawLO to portal tworzony przez uczniów dla uczniów.
+       <br />
+         <br />
+         <Break color="secondary" />
+          <br />
+
+         Masz jakiś pomysł? Myślisz, że fajnie byłoby coś tutaj dodać? To świetnie!
+         Napisz do nas na Messengerze albo mailem na ideas@warsawlo.pl
+         </p>
+       </Box>
+     </BoxWrapper>
+   </FullContainer>
+   <FullContainer className={css`
+     padding-top:2em;
+     display:flex;
+     align-items:center;
+     justify-content:center;
+     margin: 5em 0 5em 0;
+     `}>
+
+     <StartButton>Znajdź swoją szkołę już teraz</StartButton>
+   </FullContainer>
+   <Line/>
+     <FullContainer  background="primary" className={css`padding-top:2em`}>
+
+       <h1 className={css`margin-top:0`}>Kto za tym stoi?</h1>
+       <Break color="light" />
+       <h2>Hej!</h2>
+         <p className={css`width:100%`}>
+
+         Jesteśmy grupą uczniów z warszawskich gimnazjów a zarazem pasjonatów informatyki.
+         Rekrutacja spotka lub spotkała każdego z nas. Wszyscy mówią, że chcą się dostać do jak najlepszej szkoły,
+         ale przecież to, czy dana szkoła jest najlepsza to kwestia subiektywna.
+         Chcieliśmy choć trochę uprościć ten trudny wybór szkoły średniej.
+         Nasunęło się nam na myśl, że czemu nie rozwiązać tego problemu właśnie za pomocą aplikacji lub strony internetowej?
+         Tak zrodziło się WarsawLO. Całkowicie pozaszkolny, niekomercyjny projekt open-source.
+         Wiemy, że nasza strona jest niedoskonała, ale liczymy, że z Waszą pomocą damy radę ;)
+
+
+       </p>
+         <Break color="light" />
+         <h2>Kontakt</h2>
+          info@warsawlo.pl
+         <br />
+     </FullContainer>
    </PageWrapper>
    </>
  )
