@@ -15,8 +15,5 @@ const transforms = {
 	]
 }
 
-const transformParam = (name, value, toString=false) => {
-	console.log(transforms[types[name]][toString ? 1 : 0]);
-	return transforms[types[name]][toString ? 1 : 0](value)
-}
+const transformParam = (name, value, toString=false) => transforms[types[name]][toString ? 1 : 0](value)
 export default transformParam

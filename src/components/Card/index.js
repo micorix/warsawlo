@@ -1,4 +1,4 @@
-import React, {Component} from 'react'
+import React, {Component, forwardRef} from 'react'
 
 import styled from 'react-emotion'
 import {css} from 'emotion'
@@ -169,6 +169,7 @@ class SchoolCard extends Component{
  }
  render = () => {
    return (
+     <div ref={this.props.innerRef}>
      <div ref={this.el}>
        <CardElement onClick={this.selectSchool}>
        <SitePreview dimensions={this.state.dimensions} website={!this.state.loadError & Boolean(this.props.school.contact.website)}>
@@ -212,6 +213,7 @@ class SchoolCard extends Component{
          </CardBody>
        </CardElement>
      </div>
+     </div>
    )
  }
  }
@@ -219,6 +221,6 @@ class SchoolCard extends Component{
  const mapDispatchToProps = (dispatch) => ({
    selectSchool: schoolID => dispatch(selectSchool(schoolID))
  })
-
+const SchoolCardConnected = connect(null, mapDispatchToProps)(SchoolCard)
  // Use connect to put them together
- export default connect(null, mapDispatchToProps)(SchoolCard);
+ export default forwardRef((props, ref) => <SchoolCardConnected innerRef={ref} {...props}/>)

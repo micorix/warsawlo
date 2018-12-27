@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component, Fragment} from 'react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFacebook, faFacebookMessenger } from '@fortawesome/free-brands-svg-icons'
@@ -11,7 +11,7 @@ import * as styleActions from '../store/actions/style'
 import Logo from './Logo'
 import {withRouter, Link} from 'react-router-dom'
 import withBadge from '../utils/withBadge'
-
+import PrivacyModal from './modals/Privacy'
 const responsiveWidth = '1100px'
 
 const Brand = styled(Link)`
@@ -149,12 +149,13 @@ const ActionsWrapper = styled('div')`
 }
 display:inline-block;
 `
- class AppNavbar extends React.Component {
+ class AppNavbar extends Component {
   constructor(props) {
     super(props);
     this.toggle = this.toggle.bind(this);
     this.state = {
-      isOpen: false
+      isOpen: false,
+      consent: localStorage.consent
     }
     this.navbarEl = React.createRef()
   }
@@ -184,8 +185,16 @@ display:inline-block;
     e.nativeEvent.target.value = ""
     e.nativeEvent.target.blur()
   }
+  handlePrivacyModalClose = () => {
+    this.setState({
+      consent: true
+    })
+    localStorage.consent = true;
+  }
   render() {
+    let openPrivacyModal = this.props.location.pathname !== '/' && !localStorage.consent && !this.state.consent
     return (
+      <Fragment>
       <div ref={this.navbarEl}>
         <Navbar className="navbar">
 
@@ -223,6 +232,9 @@ display:inline-block;
 
         </Navbar>
       </div>
+
+      <PrivacyModal onClose={this.handlePrivacyModalClose} open={openPrivacyModal}/>
+      </Fragment>
     );
   }
 }

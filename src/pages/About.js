@@ -34,7 +34,7 @@ const First = styled(SiteWrapper)`
   display:block;
   background: ${props => props.theme.colors.primary.replace('rgb', 'rgba').replace(')', ',0)')} ;
   position:relative;
-  overflow-x:hidden;
+
   &:last-child{
     margin-top:60vh;
     margin-left:-10vw;
@@ -70,6 +70,7 @@ const First = styled(SiteWrapper)`
 
   }
   @media (max-width: ${responsiveWidth}){
+    overflow-x:hidden;
     &::before{
     transform:none;
     top:0;
@@ -85,6 +86,7 @@ const Header = styled('div')`
   margin-left:10vw;
   width:40vw;
   color:white;
+
   h1{
     font-size:3rem;
   }

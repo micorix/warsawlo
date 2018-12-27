@@ -10,18 +10,23 @@ const ModalWrapper = styled('div')`
   height:100vh;
   background: rgba(210,210,210,0.7);
   z-index: 100;
-  display:flex;
+  display:block;
   justify-content:center;
 
   .modal{
-    margin-top:20vh;
     background:white;
     width:50%;
-    height:20vh;
+    margin: 20vh auto 0 auto;
 
     display:flex;
     position:relative;
     padding: 20px;
+    & .modal-body{
+      width:80%;
+      h4{
+        line-height:1.3em;
+      }
+    }
     & .modal-close{
       position: absolute;
       top:10px;

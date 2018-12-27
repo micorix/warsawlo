@@ -12,13 +12,15 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 
 const store = configureStore()
-
+store.dispatch({
+  type: 'GET_DATA_REQUEST'
+})
 ReactDOM.render((
   <Provider store={store}>
   <ThemeProvider theme={theme}>
   <App />
   </ThemeProvider>
 </Provider>
-), document.getElementById('root'));
+), document.getElementById('root'))
 
 serviceWorker.unregister();

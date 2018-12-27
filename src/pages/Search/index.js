@@ -8,6 +8,11 @@ import SchoolData from '../../data/data.json'
 import Engine from './engine'
 import {css} from 'emotion'
 import {Redirect} from 'react-router-dom'
+import posed, { PoseGroup  } from 'react-pose'
+import worker from './worker'
+import WebWorker from './WebWorkerSetup'
+const PoseCard = posed(Card)()
+
 const PageWrapper = styled(SiteWrapper)`
     background: ${props => props.theme.colors.light};
     display: grid;
@@ -90,7 +95,8 @@ componentDidMount = () => {
      query,
      filters
    }, () => this.search())
-
+   this.worker = new WebWorker(worker)
+   this.worker.addEventListener('message', console.log)
 }
 componentDidUpdate(prevProps) {
     if (this.input.current && this.props.location !== prevProps.location && this.input.current !== document.activeElement ) {
@@ -156,14 +162,21 @@ updateFilters = (obj) => {
    {(() => {
      if(this.state.loading)
       return <Loader className={loaderStyle}/>
-     return this.state.result.map(school => {
-       return <Card
-         key={school.meta.regon}
-         school={school}
-         schoolID={SchoolData.indexOf(school)}
-         filters={this.state.filters}
-          />
-     })
+     return (
+       <PoseGroup flipMove={true} preEnterPose="preEnter">
+       {this.state.result.map(school => {
+         // return <Posed key={school.meta.regon}>{school.name.full}</Posed>
+         return (<PoseCard
+           key={school.meta.regon}
+           school={school}
+           schoolID={SchoolData.indexOf(school)}
+           filters={this.state.filters}
+            />)
+          })
+        }
+       </PoseGroup>
+     )
+
    })()}
    </div>
    </div>

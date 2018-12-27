@@ -122,7 +122,7 @@ class Filters extends Component{
 
    }
    <h3>Liczba punktów:</h3>
-   <PointsRange min={0} max={200} value={this.props.data.pointsRange ? this.props.data.pointsRange : [0,200]} onChange={this.handlePoints}/>
+   <PointsRange min={0} max={200} value={this.props.data.pointsRange ? [parseInt(this.props.data.pointsRange[0]),parseInt(this.props.data.pointsRange[1])]  : [0,200]} onChange={this.handlePoints}/>
     <h3>Lokalizacja</h3>
     <LocationWrapper enabled={Boolean(this.state.position)}>
     <p>Twoje współrzędne:<br /> {this.state.position && `${this.state.position.coords.latitude} ${this.state.position.coords.longitude}`}</p>
