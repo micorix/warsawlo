@@ -14,9 +14,9 @@ export const subjects = (values) => (school) => {
 }
 export const pointsRange = (values) => (school) => {
   if(!school.profiles){
-    if(values[0] === 0 && values[1] === 100)
+    if(values[0] === 0 && values[1] === 200)
       return true
-    return false
+    return true
   }
   if(school.profiles.overview.pointsRange[0] > values[0] && school.profiles.overview.pointsRange[1] < values[1]){
     return true

@@ -9,8 +9,7 @@ import Engine from './engine'
 import {css} from 'emotion'
 import {Redirect} from 'react-router-dom'
 import posed, { PoseGroup  } from 'react-pose'
-import worker from './worker'
-import WebWorker from './WebWorkerSetup'
+import Button from '../../components/Button'
 const PoseCard = posed(Card)()
 
 const PageWrapper = styled(SiteWrapper)`
@@ -24,11 +23,17 @@ const PageWrapper = styled(SiteWrapper)`
     height:10vh;
     display:flex;
     justify-content:center;
-    align-items:flex-end;
+    align-items:center;
     position: fixed;
     z-index: 10;
     background: ${props => props.theme.colors.light};
     padding-bottom:20px;
+
+    .meta{
+      line-height: 1.2em;
+      margin-left:10px;
+      width:100px;
+    }
   }
 
   .results{
@@ -50,12 +55,13 @@ const SearchInput = styled('input')`
   padding:10px;
   background rgb(230,230,230);
   border: 3px solid rgb(230,230,230);
-  border-radius:3px;
+  border-radius: 3px 0 0 3px;
   font-size: 1.2em;
-  width:50%;
+  width:80%;
   transition: .2s all;
   &:focus{
     border: 3px solid rgb(210,210,210);
+    border-right:3px solid rgb(230,230,230);
   }
   position:relative;
   &::after{
@@ -71,12 +77,25 @@ position: absolute;               /* 2 */
  top: 50%;                         /* 3 */
  transform: translate(0, -50%) }   /* 4 */
 `
-
+const SearchButton = styled(Button)`
+  background: ${props => props.theme.colors.primary};
+  color:white;
+  font-size:1.2em;
+  height: 1.2em;
+  border-width:3px;
+  border-radius: 0 3px 3px 0;
+  border-left:none;
+  border-color: ${props => props.active ? 'rba(210,210,210)' : 'rgb(230,230,230)'};
+`
+const SearchForm = styled('form')`
+  display:flex;
+  width:50%;
+`
  export default class Search extends Component{
  constructor(props){
  super(props)
  this.input = React.createRef()
- this.engine = new Engine()
+ this.engine = new Engine(SchoolData)
  this.state = {
    query: '',
    filters: {
@@ -84,19 +103,50 @@ position: absolute;               /* 2 */
      pointsRange: [0, 200]
    },
    result: [],
-   loading: false,
+   loading: true,
    error: null,
-   errorInfo: null
+   errorInfo: null,
+   notFound: false,
+   fetchingDone: false,
+   startTime: null,
+   inputFocus: false
  }
 }
 componentDidMount = () => {
-  let {query, filters} = this.engine.fromParams(this.props.location.search)
-  this.setState({
-     query,
-     filters
-   }, () => this.search())
-   this.worker = new WebWorker(worker)
-   this.worker.addEventListener('message', console.log)
+  // let {query, filters} = this.engine.fromParams(this.props.location.search)
+  // this.setState({
+  //    query,
+  //    filters
+  //  }, () => this.search())
+
+   this.worker = new Worker('./worker.js', { type: 'module'})
+   this.worker.addEventListener('message', e => {
+
+     if(this.state.fetchingDone === false){
+       this.setState({
+         fetchingDone: true
+     })
+     }
+     let { result, paramsURI} = JSON.parse(e.data)
+     console.log(result)
+     this.setState({
+     result,
+     loading: false,
+   })
+   clearTimeout(this.timeout)
+   if(paramsURI)
+    this.props.history.push(`${this.props.location.pathname}?${paramsURI}`)
+   })
+}
+handleFocus = () => this.setState({
+  inputFocus: true
+})
+handleBlur = () => this.setState({
+  inputFocus: false
+})
+handleFormSubmit = (e) => {
+  e.preventDefault()
+  this.search()
 }
 componentDidUpdate(prevProps) {
     if (this.input.current && this.props.location !== prevProps.location && this.input.current !== document.activeElement ) {
@@ -109,22 +159,27 @@ componentDidUpdate(prevProps) {
     errorInfo: errorInfo
   })
 }
-handleSearch = (e) => {
+handleInputChange = (e) => {
     this.setState({
-      loading: true,
       query: e.target.value
-    }, () => this.search())
+    })
   }
 search = () => {
-  this.engine.search(this.state.query, this.state.filters).then(result => {
-    console.log(result);
+  if(this.state.fetchingDone){
+    let { query, filters } = this.state
+    clearTimeout(this.timeout)
     this.setState({
-    result,
-    loading: false
-  })
-  let paramsURI = this.engine.generateParamsURI(this.state.query, this.state.filters)
-  this.props.history.push(`${this.props.location.pathname}?${paramsURI}`)
-})
+      startTime: new Date().getTime()
+    })
+    this.timeout = setTimeout(() => this.setState({
+      loading: false,
+      notFound: true
+    }), 10000)
+    this.worker.postMessage(JSON.stringify({
+      query,
+      filters
+    }))
+  }
 }
 updateFilters = (obj) => {
   this.setState(state => ({
@@ -153,19 +208,38 @@ updateFilters = (obj) => {
 
    <div>
    <div className="input-wrapper">
+
    <h4 style={{marginRight:20}}>Szukaj:</h4>
-
-   <SearchInput innerRef={this.input} value={this.state.query} onChange={this.handleSearch} time={30}/>
-
+   <SearchForm onSubmit={this.handleFormSubmit}>
+   <SearchInput
+    innerRef={this.input}
+    value={this.state.query}
+    onChange={this.handleInputChange}
+    time={30}
+    onFocus={this.handleFocus}
+    onBlur={this.handleBlur}
+    disabled={this.state.loading}/>
+   <SearchButton active={this.state.inputFocus}>Szukaj</SearchButton>
+   </SearchForm>
+  <div className="meta">
+    <div>Total: {this.state.result.length}</div>
+    <div>{this.state.startTime &&<span>w {(new Date().getTime() - this.state.startTime) / 1000} s</span>}</div>
+  </div>
    </div>
    <div  className="results">
    {(() => {
+     if(this.state.notFound | this.state.result.length === 0)
+      return (
+        <div>
+        <h1>Sorry</h1>
+        <h3>Nie mogliśmy znaleźć tej szkoły</h3>
+        </div>
+      )
      if(this.state.loading)
       return <Loader className={loaderStyle}/>
      return (
-       <PoseGroup flipMove={true} preEnterPose="preEnter">
+  <PoseGroup>
        {this.state.result.map(school => {
-         // return <Posed key={school.meta.regon}>{school.name.full}</Posed>
          return (<PoseCard
            key={school.meta.regon}
            school={school}
@@ -174,7 +248,8 @@ updateFilters = (obj) => {
             />)
           })
         }
-       </PoseGroup>
+      </PoseGroup>
+
      )
 
    })()}

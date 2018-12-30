@@ -4,5 +4,8 @@
     ["module-resolver", {
       "root": ["./src/"],
     }]
+  ],
+  "presets": [
+    "react-app"
   ]
 }

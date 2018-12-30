@@ -15,6 +15,9 @@ import PrivacyModal from './modals/Privacy'
 const responsiveWidth = '1100px'
 
 const Brand = styled(Link)`
+&, &:visited, &:hover{
+  background:initial;
+}
 all:unset;
 cursor:pointer;
 margin-right:20px;
@@ -50,7 +53,7 @@ display:flex;
 align-items:center;
 padding:0 20px 0 20px;
 background:white;
-z-index:10;
+z-index:99;
 border-bottom: 2px solid ${props => props.theme.colors.light};
 `
 const SearchInput = styled('input')`
@@ -99,7 +102,11 @@ div:not(&:last-child){
 `
 
 const Action = styled('a')`
-margin:20px;
+margin:10px;
+&, &:visited, &:hover{
+  color: ${props => props.theme.colors.primary};
+  background:initial;
+}
 `
 const NavLink = withBadge(styled(Link)`
 @media (max-width: ${responsiveWidth}) {
@@ -110,7 +117,11 @@ cursor:pointer;
 margin:20px;
 color: rgb(100, 100,100);
 transition: .2s all;
+&:visited{
+  color: rgb(100, 100,100);
+}
 &:hover, &.active{
+  background:initial;
   color:black;
 }
 `,{

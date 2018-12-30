@@ -183,8 +183,8 @@ class SchoolCard extends Component{
        }
        </SitePreview>
          <CardBody>
-           <h1>{this.props.school.name.full}</h1>
-           <h2>{this.props.school.location.address.District}</h2>
+           <h1>{this.props.school.name.full && this.props.school.name.full}</h1>
+           <h2>{this.props.school.location.address && this.props.school.location.address.District}</h2>
            {(() => {
             if(this.props.school.profiles){
               return this.props.school.profiles.overview.availableSubjects.map(subject => {

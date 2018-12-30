@@ -2,14 +2,14 @@ import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import styled from 'react-emotion'
 import {Link, Redirect} from 'react-router-dom'
-
+import {css} from 'emotion'
 import SiteWrapper from '../components/SiteWrapper'
 import SchoolData from '../data/data.json'
 import Subjects from '../data/subjects.json'
-import Tag from '../components/Tag'
+import Tag from './Tag'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import ScrollspyNav from "react-scrollspy-nav"
 import { faPhone, faGlobe, faAt, faFax, faMapMarkerAlt, faRoad, faCity, faUsers, faSchool, faHandshake, faMoneyBill } from '@fortawesome/free-solid-svg-icons'
-
 const Wrapper = styled('div')`
   width:100%;
   height:100%;
@@ -28,10 +28,20 @@ position:absolute;
 border-radius:20px;
 cursor:pointer;
 `
-const Grid = styled('div')`
+const InfoGrid = styled('div')`
+a, a:visited{
+  color: ${props => props.theme.colors.primary};
+  padding: 5px;
+  border-radius:3px;
+  transition: .1s all;
+}
+a:hover{
+  background: ${props => props.theme.colors.primary};
+  color:white;
+}
   display: grid;
   visibility: ${props => props.show ? 'visible' : 'hidden'};
-grid-template-columns: repeat(4, 1fr);
+grid-template-columns: repeat(3, 1fr);
 grid-column-gap: 30px;
 grid-row-gap: 30px;
 
@@ -54,6 +64,13 @@ const Box = styled('div')`
   background:white;
   padding:10px;
 `
+const HeaderBox = styled(Box)`
+  position: ${'sticky'};
+  top: ${props => props.navHeight-2}px;
+  left:0;
+  right:0;
+  z-index:20;
+`
 const InnerGrid = styled('div')`
   & > div {
     display: grid;
@@ -75,6 +92,32 @@ const AddressGrid = styled('div')`
   grid-row-gap: 20px;
 
 `
+const ProfilesGrid = styled('div')`
+    display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-column-gap: 10px;
+  grid-row-gap: 20px;
+  .profile{
+    display:grid;
+    grid-template-columns: 8fr 2fr;
+    margin: 20px 0 20px 0;
+  }
+`
+const SectionHeader = styled('h1')`
+margin-left:20px;
+width:calc(100% - 40px);
+color:${props => props.theme.colors.primary};
+border-bottom: 3px solid ${props => props.theme.colors.primary};
+`
+const YearHeader = styled('h3')`
+  width:calc(100% - 40px);
+  color:black;
+  border-bottom: 3px solid black;
+  margin-bottom:-20px;
+  margin-left:20px;
+  text-align:center;
+`
+const noMargin = direction => css`margin-${direction}: 0;`
 const contactMapping = [
   {
     name: 'website',
@@ -113,36 +156,28 @@ class SchoolInfo extends Component{
  return (
    <Wrapper>
    <Handler to={this.props.collapsed ? `/school/${this.props.select.school.name.full}` : '/map'} />
-   <Box>
+   <HeaderBox navHeight={this.props.style.navHeight}>
    <h1>{this.props.select.school.name.full}</h1>
    <h4>{this.props.select.school.meta.schoolType}</h4>
-   </Box>
-   <Grid show={!this.props.collapsed}>
+   <ScrollspyNav
+                       scrollTargetIds={["basic-info", "profiles",]}
+                       activeNavClass="is-active"
+                       scrollDuration="1000"
+                       headerBackground={false}
+                   >
    <div>
-     <Box>
-       <h4>Profile:</h4>
-       {
-         (() => {
-           if(!this.props.select.school.profiles)
-            return null
+    <a href="#basic-info"><Tag active={true}>Informacje</Tag></a>
+    <a href="#profiles"><Tag active={false}>Profile</Tag></a>
+   </div>
+   </ScrollspyNav>
+   </HeaderBox>
+   <div id="basic-info">
+   <SectionHeader>Informacje</SectionHeader>
+   <Box className={noMargin('bottom')}>
+    <p>Szkoła o wieloletniej tradycji</p>
+   </Box>
+   <InfoGrid show={!this.props.collapsed} className={noMargin('top')}>
 
-           return this.props.select.school.profiles.detailed.map(profile => {
-             return (
-               <div className="profile">
-                 {profile[0].map(subject => {
-                   let color = Subjects.filter(arr => arr[2] == subject)[0]
-                   if(color)
-                    return <Tag color={color[1]}>{subject}</Tag>
-                  return <Tag>{subject}</Tag>
-                 })}
-                 <p className="threshold">{profile[1]} {isNaN(profile[1]) ? null : 'pkt'}</p>
-               </div>
-             )
-           })
-         })()
-       }
-
-     </Box></div>
      <div>
      <Box>
      <h4>Kontakt:</h4>
@@ -216,14 +251,64 @@ class SchoolInfo extends Component{
           </div>
         </InnerGrid>
     </Box></div>
-   </Grid>
+   </InfoGrid>
+   </div>
+   <div id="profiles">
+   <SectionHeader>Profile</SectionHeader>
+   <ProfilesGrid>
+   <div>
+   <YearHeader>2018</YearHeader>
+     <Box>
+       <h4>Profile:</h4>
+       {
+         (() => {
+           if(!this.props.select.school.profiles)
+            return null
+
+           return this.props.select.school.profiles.detailed.map(profile => {
+             return (
+               <div className="profile">
+               <div>
+                 {profile[0].map(subject => {
+                   let color = Subjects.filter(arr => arr[2] == subject)[0]
+                   if(color)
+                    return <Tag color={color[1]}>{subject}</Tag>
+                  return <Tag>{subject}</Tag>
+                 })}
+                 </div>
+                 <span className="threshold">{profile[1]} {isNaN(profile[1]) ? null : 'pkt'}</span>
+               </div>
+             )
+           })
+         })()
+       }
+
+     </Box></div>
+   </ProfilesGrid>
+   </div>
+   <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/>
+   <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/>
+   <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/>
+   <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/>
+   <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/>
+   <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/>
+   <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/>
+   <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/>
+   <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/>
+   <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/>
+   <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/>
+   <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/>
+   <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/>
+   <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/>
+   <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/>
    </Wrapper>
  )
  }
  }
  const mapStateToProps = (state, ownProps) => {
    return ({
-     select: state.select
+     select: state.select,
+     style: state.style
  })
  }
 

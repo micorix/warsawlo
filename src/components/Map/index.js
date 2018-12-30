@@ -5,7 +5,7 @@ import {css} from 'emotion'
 import {connect} from 'react-redux'
 import addSchoolMarkers from './schoolMarkers'
 import {injectGlobal} from 'emotion'
-import {selectSchool} from '../../store/actions/select'
+import {selectSchool, unselectSchool} from '../../store/actions/select'
 mapboxgl.accessToken = 'pk.eyJ1IjoibWljb3JpeHBhYm1lZCIsImEiOiJjamxrcGN2MW0wbXlxM2twaXZjdXU1eDEyIn0.4_sxaF5tHhMDudaaJ8_vzQ';
 
 injectGlobal`
@@ -32,7 +32,13 @@ class Map extends React.Component {
       ...mapDefaults
     })
     window.mapEl = this.map
-    console.log(this.map.getMaxBounds());
+    this.props.getMap(this.map)
+    this.map.on('click', e => {
+      let marker = e.originalEvent.path.filter(el => el.classList && el.classList.contains('school-marker'))[0]
+      if(!marker){
+        this.props.unselectSchool()
+      }
+    })
     this.map.addControl(new mapboxgl.NavigationControl());
     let schoolMarkers = addSchoolMarkers({
       map: this.map,
@@ -96,24 +102,18 @@ class Map extends React.Component {
 
     // school selection changed
     if(this.props.select.school !== null && schoolChanged){
-      let bounds = this.map.getBounds()
-      let padding = Math.abs(bounds._ne.lat - bounds._sw.lat)*6/10
-        // let padding = 0
       let position = [
         this.props.select.school.location.position.Longitude,
         this.props.select.school.location.position.Latitude,
       ]
       this.map.stop()
-      this.map.easeTo({
-        center: position,
-        duration: 800,
-        offset:[0,100],
-        zoom: 14,
-        around: [
-          this.props.select.school.location.position.Longitude,
-          this.props.select.school.location.position.Latitude
-        ]
-      })
+      setTimeout(() => {
+        this.map.easeTo({
+          center: position,
+          duration: 800,
+          zoom: 14,
+        })
+      }, 300)
       // this.animationTimeout = setTimeout(() => {
       //   this.map.easeTo({
       //     zoom: 17,
@@ -133,7 +133,7 @@ class Map extends React.Component {
     return (<div ref={this.mapContainer} className={css`
     width:${'100%'};
     float:right;
-    height:calc(100vh - ${navHeight}px);
+    height:100%;
     div[class^='mapboxgl-ctrl-'], .mapboxgl-marker{
       top:auto;
       left:auto;
@@ -149,7 +149,8 @@ const mapStateToProps = (state, ownProps) => {
 }
 
 const mapDispatchToProps = (dispatch) => ({
-  selectSchool: schoolID => dispatch(selectSchool(schoolID))
+  selectSchool: schoolID => dispatch(selectSchool(schoolID)),
+  unselectSchool: () => dispatch(unselectSchool())
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Map);

@@ -11,15 +11,6 @@ WebFont.load({
     families: ['Ostrich Sans Rounded'],
     urls: ['https://cdn.jsdelivr.net/gh/theleagueof/ostrich-sans/webfonts/ostrich-sans.css']
 }})
-injectGlobal`
-*{
-  font-family: Work Sans;
-}
-body{
-  overflow-x: hidden;
-  margin:0;
-}
-`
 const theme = {
   colors: {
     primary: 'rgb(89, 0, 138)',
@@ -35,4 +26,13 @@ const theme = {
     tertiary: 'Ostrich Sans Rounded'
   }
 }
+injectGlobal`
+*{
+  font-family: Work Sans;
+}
+body{
+  overflow-x: hidden;
+  margin:0;
+}
+`
 export default theme
