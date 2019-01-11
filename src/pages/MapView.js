@@ -50,16 +50,19 @@ class MapView extends Component{
      this.state = {
        smallMap: false
      }
+     if(!this.props.data.fetching && !this.props.data.data){
+       this.props.fetchSchools()
+     }
    }
    componentDidMount = () => {
-     setTimeout(() => this.map.resize(), 300)
+     setTimeout(() => this.map && this.map.resize(), 300)
    }
    componentDidUpdate = (prevProps) => {
-     let schoolChanged = prevProps.select.school !== this.props.select.school
+     let schoolChanged = prevProps.select.schoolID !== this.props.select.schoolID
 
 
      // selection has been cleared
-     if(this.props.select.school === null && prevProps.select.school !== null){
+     if(this.props.select.schoolID === null && prevProps.select.schoolID !== null){
        this.props.history.push(`/map`)
        this.setState({
          smallMap: false
@@ -74,8 +77,8 @@ class MapView extends Component{
      }
 
      // school selection changed
-     if(this.props.select.school !== null && schoolChanged){
-       this.props.history.push(`/school/${this.props.select.school.name.full}`)
+     if(this.props.select.schoolID !== null && schoolChanged){
+       this.props.history.push(`/school/${this.props.select.schoolID}`)
        this.setState({
          smallMap: true
        }, () => this.map.resize())
@@ -88,8 +91,11 @@ class MapView extends Component{
      this.map = mapEl
    }
    render = () => {
+     if(this.props.data.fetching || !this.props.data.data){
+       return <h3>Loading</h3>
+     }
      let collapsed = !Boolean(this.props.match.params.schoolID)
-     let hidden = !Boolean(this.props.select.school)
+     let hidden = !Boolean(this.props.select.schoolID)
      return (
        <Fragment>
        <HeaderWrapper collapsed={collapsed} navHeight={this.props.style.navHeight}>
@@ -109,11 +115,13 @@ class MapView extends Component{
  const mapStateToProps = (state, ownProps) => {
    return ({
      style: state.style,
-     select: state.select
+     select: state.select,
+     data: state.data
  })
  }
  const mapDispatchToProps = (dispatch) => ({
-   selectSchool: schoolID => dispatch(selectSchool(schoolID))
+   selectSchool: schoolID => dispatch(selectSchool(schoolID)),
+   fetchSchools: () => dispatch({ type: 'GET_DATA_REQUEST' })
  })
 
  export default connect(mapStateToProps, mapDispatchToProps)(MapView);

@@ -10,6 +10,7 @@ import {css} from 'emotion'
 import {Redirect} from 'react-router-dom'
 import posed, { PoseGroup  } from 'react-pose'
 import Button from '../../components/Button'
+import {connect} from 'react-redux'
 const PoseCard = posed(Card)()
 
 const PageWrapper = styled(SiteWrapper)`
@@ -91,7 +92,7 @@ const SearchForm = styled('form')`
   display:flex;
   width:50%;
 `
- export default class Search extends Component{
+class Search extends Component{
  constructor(props){
  super(props)
  this.input = React.createRef()
@@ -111,6 +112,7 @@ const SearchForm = styled('form')`
    startTime: null,
    inputFocus: false
  }
+ this.props.fetchSchools()
 }
 componentDidMount = () => {
   // let {query, filters} = this.engine.fromParams(this.props.location.search)
@@ -259,3 +261,12 @@ updateFilters = (obj) => {
  )
  }
  }
+ const mapStateToProps = (state, ownProps) => {
+   return ({
+     data: state.data
+ })
+ }
+ const mapDispatchToProps = (dispatch) => ({
+   fetchSchools: () => dispatch({ type: 'GET_DATA_REQUEST' })
+ })
+ export default connect(mapStateToProps, mapDispatchToProps)(Search);

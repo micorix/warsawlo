@@ -36,13 +36,14 @@ class Map extends React.Component {
     this.map.on('click', e => {
       let marker = e.originalEvent.path.filter(el => el.classList && el.classList.contains('school-marker'))[0]
       if(!marker){
-        this.props.unselectSchool()
+        this.props.selectSchool(null)
       }
     })
     this.map.addControl(new mapboxgl.NavigationControl());
     let schoolMarkers = addSchoolMarkers({
       map: this.map,
-      selectSchool: this.props.selectSchool
+      selectSchool: this.props.selectSchool,
+      schools: this.props.data.data
     })
     this.schoolMarkers = schoolMarkers
     this.map.on('load', () => {
@@ -86,7 +87,7 @@ class Map extends React.Component {
     this.frameId = window.requestAnimationFrame(this.rotateCamera)
   }
   componentDidUpdate = (prevProps) => {
-    let schoolChanged = prevProps.select.school !== this.props.select.school
+    let schoolChanged = prevProps.select.schoolID !== this.props.select.schoolID
 
     if(schoolChanged){
       window.dispatchEvent(new Event('resize')) // resize map
@@ -95,16 +96,16 @@ class Map extends React.Component {
     }
 
     // selection has been cleared
-    if(this.props.select.school === null && prevProps.select.school !== null){
+    if(this.props.select.schoolID === null && prevProps.select.schoolID !== null){
       this.map.easeTo(mapDefaults)
       this.schoolMarkers.forEach(marker => marker.getElement().classList.remove('active'))
     }
 
     // school selection changed
-    if(this.props.select.school !== null && schoolChanged){
+    if(this.props.select.schoolID !== null && schoolChanged){
       let position = [
-        this.props.select.school.location.position.Longitude,
-        this.props.select.school.location.position.Latitude,
+        this.props.data.data[this.props.select.schoolID].location.position.Longitude,
+        this.props.data.data[this.props.select.schoolID].location.position.Latitude,
       ]
       this.map.stop()
       setTimeout(() => {
@@ -144,7 +145,8 @@ class Map extends React.Component {
 const mapStateToProps = (state, ownProps) => {
   return ({
     style: state.style,
-    select: state.select
+    select: state.select,
+    data: state.data
 })
 }
 

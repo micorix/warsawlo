@@ -1,5 +1,5 @@
 import { takeLatest, call, put } from 'redux-saga/effects';
-const apiURL = 'https://cdn.jsdelivr.net/gh/WarsawLO/data/data/data.json'
+const apiURL = 'https://cdn.jsdelivr.net/gh/WarsawLO/data@92706ad/data/data.json'
 
 
 // watcher saga: watches for actions dispatched to the store, starts worker saga

@@ -2,7 +2,7 @@
 import Engine from './engine'
 
   let self = this
-  const apiURL = 'https://cdn.jsdelivr.net/gh/WarsawLO/data/data/data.json'
+  const apiURL = 'https://cdn.jsdelivr.net/gh/WarsawLO/data@92706ad/data/data.json'
   let data = {}
   let engine = null
   fetch(apiURL).then(res => res.json()).then(downloadedData => {

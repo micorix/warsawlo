@@ -150,15 +150,15 @@ class SchoolInfo extends Component{
  super(props)
  }
  render = () => {
-  if(!this.props.select.school){
+  if(!this.props.data.data[this.props.select.schoolID]){
     return <Redirect to='/map' />
   }
  return (
    <Wrapper>
-   <Handler to={this.props.collapsed ? `/school/${this.props.select.school.name.full}` : '/map'} />
+   <Handler to={this.props.collapsed ? `/school/${this.props.data.data[this.props.select.schoolID].name.full}` : '/map'} />
    <HeaderBox navHeight={this.props.style.navHeight}>
-   <h1>{this.props.select.school.name.full}</h1>
-   <h4>{this.props.select.school.meta.schoolType}</h4>
+   <h1>{this.props.data.data[this.props.select.schoolID].name.full}</h1>
+   <h4>{this.props.data.data[this.props.select.schoolID].meta.schoolType}</h4>
    <ScrollspyNav
                        scrollTargetIds={["basic-info", "profiles",]}
                        activeNavClass="is-active"
@@ -184,10 +184,10 @@ class SchoolInfo extends Component{
      <InnerGrid>
        {(() => {
          return contactMapping.map(contact => {
-           if(!this.props.select.school.contact[contact.name])
+           if(!this.props.data.data[this.props.select.schoolID].contact[contact.name])
               return null
 
-           let value = contact.transform ? contact.transform(this.props.select.school.contact[contact.name]) : this.props.select.school.contact[contact.name]
+           let value = contact.transform ? contact.transform(this.props.data.data[this.props.select.schoolID].contact[contact.name]) : this.props.data.data[this.props.select.schoolID].contact[contact.name]
            return (
              <div>
                <div>
@@ -214,15 +214,15 @@ class SchoolInfo extends Component{
     <Box>
       <h4>Lokalizacja:</h4>
       <span className="geo">
-{this.props.select.school.location.position.Latitude}, {this.props.select.school.location.position.Longitude}
+{this.props.data.data[this.props.select.schoolID].location.position.Latitude}, {this.props.data.data[this.props.select.schoolID].location.position.Longitude}
       </span>
         <AddressGrid>
           <span><FontAwesomeIcon icon={faRoad} /></span>
-          {this.props.select.school.location.address.Street} {this.props.select.school.location.address.HouseNumber}<br/>
+          {this.props.data.data[this.props.select.schoolID].location.address.Street} {this.props.data.data[this.props.select.schoolID].location.address.HouseNumber}<br/>
           <span><FontAwesomeIcon icon={faCity} /></span>
-          {this.props.select.school.location.address.Subdistrict}<br/>
+          {this.props.data.data[this.props.select.schoolID].location.address.Subdistrict}<br/>
           <span><FontAwesomeIcon icon={faMapMarkerAlt} /></span>
-          {this.props.select.school.location.address.District}
+          {this.props.data.data[this.props.select.schoolID].location.address.District}
         </AddressGrid>
     </Box></div><div>
     <Box>
@@ -232,22 +232,22 @@ class SchoolInfo extends Component{
           <div>
             <span><FontAwesomeIcon icon={faUsers} /></span>
             <span>Publiczna:</span>
-            <span>{this.props.select.school.meta.public === true ? 'TAK' : this.props.select.school.meta.public === false ? 'NIE' : this.props.select.school.meta.public}</span>
+            <span>{this.props.data.data[this.props.select.schoolID].meta.public === true ? 'TAK' : this.props.data.data[this.props.select.schoolID].meta.public === false ? 'NIE' : this.props.data.data[this.props.select.schoolID].meta.public}</span>
           </div>
           <div>
             <span><FontAwesomeIcon icon={faSchool} /></span>
             <span>Organ prowadzący:</span>
-            <span>{this.props.select.school.meta.leadingOrgan.type} {this.props.select.school.meta.leadingOrgan.name}</span>
+            <span>{this.props.data.data[this.props.select.schoolID].meta.leadingOrgan.type} {this.props.data.data[this.props.select.schoolID].meta.leadingOrgan.name}</span>
           </div>
           <div>
             <span><FontAwesomeIcon icon={faHandshake} /></span>
             <span>Organizacja:</span>
-            <span>{this.props.select.school.meta.parent}</span>
+            <span>{this.props.data.data[this.props.select.schoolID].meta.parent}</span>
           </div>
           <div>
             <span><FontAwesomeIcon icon={faMoneyBill} /></span>
             <span>Właściciel kapitału:</span>
-            <span>{this.props.select.school.meta.capitalOwner}</span>
+            <span>{this.props.data.data[this.props.select.schoolID].meta.capitalOwner}</span>
           </div>
         </InnerGrid>
     </Box></div>
@@ -262,10 +262,10 @@ class SchoolInfo extends Component{
        <h4>Profile:</h4>
        {
          (() => {
-           if(!this.props.select.school.profiles)
+           if(!this.props.data.data[this.props.select.schoolID].profiles)
             return null
 
-           return this.props.select.school.profiles.detailed.map(profile => {
+           return this.props.data.data[this.props.select.schoolID].profiles.detailed.map(profile => {
              return (
                <div className="profile">
                <div>
@@ -308,7 +308,8 @@ class SchoolInfo extends Component{
  const mapStateToProps = (state, ownProps) => {
    return ({
      select: state.select,
-     style: state.style
+     style: state.style,
+     data: state.data
  })
  }
 

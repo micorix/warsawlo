@@ -1,9 +1,9 @@
-export default (state = {school: null}, action) => {
+export default (state = {schoolID: null}, action) => {
   switch (action.type){
     case 'SELECT_SCHOOL':
         return {
           ...state,
-          school: action.school
+          schoolID: action.schoolID
         }
     default:
           return state;

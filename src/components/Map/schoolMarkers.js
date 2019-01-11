@@ -37,7 +37,8 @@ const generateMarker = ({schoolID, selectSchool}) => {
   })
   return marker
 }
-const addSchoolMarkers = ({map, selectSchool}) => SchoolData.map((school, schoolID) => {
+const addSchoolMarkers = ({map, selectSchool, schools}) => schools.map((school, schoolID) => {
+  console.log(school)
   return new mapboxgl.Marker(generateMarker({schoolID, selectSchool, map}))
   .setLngLat([school.location.position.Longitude, school.location.position.Latitude])
   .addTo(map)
